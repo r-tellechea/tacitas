@@ -13,24 +13,38 @@ class Board ():
 			return_string += '\n'
 		return return_string
 
-	def set_piece(self, coordinates : Coordinates, piece : Piece) -> None:
-		if not coordinates.valid():
+	def correct_coordinates(self, coordinates : Coordinates) -> bool:
+		return 0 <= coordinates.i < 6 and 0 <= coordinates.j < 6
+
+	def check_correct_coordinates(self, coordinates : Coordinates) -> None:
+		if not self.correct_coordinates(coordinates):
 			raise(Exception('Las coordinates introducidas no son válidas.'))
+	
+	def is_piece(self, coordinates : Coordinates) -> bool:
+		self.check_correct_coordinates(coordinates)
+		return isinstance(self.cells[coordinates.i][coordinates.j], Piece)
+
+	def check_is_piece(self, coordinates : Coordinates) -> None:
+		if not self.is_piece(coordinates):
+			raise(Exception('No hay una pieza en las coordenadas introducidas.'))	
+	
+	def correct_movement(self, coordinates : Coordinates, direction : Direction) -> bool:
+		return direction in self.movimientos_disponibles(coordinates)
+
+	def check_correct_movement(self, coordinates : Coordinates, direction : Direction) -> None:
+		if not self.correct_movement(coordinates, direction):
+			raise(Exception('No se puede mover a esa casilla.'))
+
+	def set_piece(self, coordinates : Coordinates, piece : Piece) -> None:
+		self.check_correct_coordinates(coordinates)
 		self.cells[coordinates.i][coordinates.j] = piece
 	
 	def get_piece(self, coordinates : Coordinates) -> Piece:
-		if not coordinates.valid():
-			raise(Exception('Las coordinates introducidas no son válidas.'))
+		self.check_correct_coordinates(coordinates)
 		return self.cells[coordinates.i][coordinates.j]
 
-	def is_piece(self, coordinates : Coordinates) -> bool:
-		if not coordinates.valid():
-			raise(Exception('Las coordinates introducidas no son válidas.'))
-		return isinstance(self.cells[coordinates.i][coordinates.j], Piece)
-
 	def movimientos_disponibles(self, coordinates : Coordinates):
-		if not self.is_piece(coordinates):
-			raise(Exception('No hay una piece en esa casilla'))
+		self.check_is_piece(coordinates)
 		
 		# Quitamos de todas las posibles direcciones las que no son posibles por:
 		# 1) La dirección choca con una pared.
@@ -89,8 +103,6 @@ class Board ():
 		return Direction.get_all_directions() - {direcciones_restringidas[coordinates]}
 	
 	def mover_piece(self, coordinates : Coordinates, direction : Direction) -> None:
-		if not self.is_piece(coordinates):
-			raise(Exception('No hay una pieza en esa casilla'))
-		if not direction in self.movimientos_disponibles(coordinates):
-			raise(Exception('No se puede mover a esa casilla.'))
+		self.check_is_piece(coordinates)
+		self.check_correct_movement(coordinates, direction)
 		# TO DO determinar los movimientos disponibles.
