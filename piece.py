@@ -1,7 +1,10 @@
+from player import Player
+from color import Color
+
 class Piece():
-	def __init__(self, color : str, jugador : int):
+	def __init__(self, color : Color, player : Player):
 		self.color = color
-		self.jugador = jugador
+		self.player = player
 
 	def __str__(self):
-		return str(self.jugador)
+		return str(self.player)
