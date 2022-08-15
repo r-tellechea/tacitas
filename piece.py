@@ -1,4 +1,4 @@
-class Pieza():
+class Piece():
 	def __init__(self, color : str, jugador : int):
 		self.color = color
 		self.jugador = jugador
