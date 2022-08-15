@@ -1,9 +1,15 @@
 from piece import Piece
+from player import Player
 from coordinates import Coordinates, Direction
 
 class Board ():
 	def __init__(self):
 		self.cells = [[None for _ in range(6)] for _ in range(6)]
+		self.player_top = Player()
+		self.player_bot = ~self.player_top
+		# TO DO: Que quede tan chulo como arriba.
+		self.color_blue = Color('blue')
+		self.color_red  = Color('red')
 
 	def __str__(self):
 		return_string = ''
@@ -50,7 +56,7 @@ class Board ():
 		# 1) La dirección choca con una pared.
 		# 2) La dirección choca con una esquina.
 		# TO DO: Que la esquina dependa del jugador.
-		set_directions = self.movimientos_paredes(coordinates) & self.movimientos_esquinas(coordinates)
+		set_directions = self.movimientos_paredes(coordinates) & self.movements_corner(coordinates)
 
 		## NOS HEMOS QUEDADO AQUI.
 
@@ -89,20 +95,58 @@ class Board ():
 			directions - {Direction(1)}
 		return directions
 		
-	def movimientos_esquinas(self, coordinates : Coordinates) -> set[Direction]:
-		direcciones_restringidas = {
+	def movements_corner(self, coordinates : Coordinates) -> set[Direction]:
+		restricted_corner_top = {
 			Coordinates(0, 1) : Direction(3),
 			Coordinates(1, 0) : Direction(0),
 			Coordinates(0, 4) : Direction(1),
-			Coordinates(1, 5) : Direction(0),
+			Coordinates(1, 5) : Direction(0)
+		}
+
+		restricted_corner_bot = {
 			Coordinates(4, 0) : Direction(2),
 			Coordinates(5, 1) : Direction(3),
 			Coordinates(4, 5) : Direction(2),
 			Coordinates(5, 4) : Direction(1)
 		}
-		return Direction.get_all_directions() - {direcciones_restringidas[coordinates]}
+
+		restricted_corner = restricted_corner_top | restricted_corner_bot
+
+		piece = self.get_piece(coordinates)
+		directions = Direction.get_all_directions()
+
+		if piece.color == self.color_red:
+			return directions - {
+				restricted_corner[coordinates] 
+					if not coordinates in restricted_corner 
+						else None
+			}
+		else:
+			if piece.player == self.player_top:
+				return directions - {
+					restricted_corner_top[coordinates] 
+						if not coordinates in restricted_corner_top 
+							else None
+				}
+			else:
+				return directions - {
+					restricted_corner_bot[coordinates] 
+						if not coordinates in restricted_corner_bot 
+							else None
+				}
+
 	
 	def mover_piece(self, coordinates : Coordinates, direction : Direction) -> None:
 		self.check_is_piece(coordinates)
 		self.check_correct_movement(coordinates, direction)
 		# TO DO determinar los movimientos disponibles.
+
+if __name__ == '__main__':
+	from color import Color
+	from player import Player
+	piece_1 = Piece(Color('red'), Player(1))
+	piece_2 = Piece(Color('blue'), Player(2))
+	board = Board()
+	board.set_piece(Coordinates(0,1), piece_1)
+	board.set_piece(Coordinates(0,2), piece_2)
+	print(board)
