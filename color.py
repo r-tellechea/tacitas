@@ -4,3 +4,6 @@ class Color():
 	
 	def __str__(self) -> str:
 		return self.color
+
+	def __eq__(self, other: object) -> bool:
+		return self.color == other.color
