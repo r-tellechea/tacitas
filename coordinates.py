@@ -16,7 +16,7 @@ class Direction():
 		return {Direction(index) for index in range(4)}
 		
 class Coordinates():
-	def __init__(self, i : int, j : int, limit_i : int = 6, limit_j : int = 6) -> None:
+	def __init__(self, i : int, j : int) -> None:
 		self.i = i
 		self.j = j
 		self.limit_i = limit_i
@@ -27,14 +27,14 @@ class Coordinates():
 	
 	def __add__(self, other : Direction):
 		if   other.direction_code == 0:
-			return (self.i - 1, self.j)
+			return Coordinates(self.i - 1, self.j)
 		elif other.direction_code == 1:
-			return (self.i, self.j + 1)
+			return Coordinates(self.i, self.j + 1)
 		elif other.direction_code == 2:
-			return (self.i + 1, self.j)
+			return Coordinates(self.i + 1, self.j)
 		elif other.direction_code == 3:
-			return (self.i, self.j - 1)
-		
+			return Coordinates(self.i, self.j - 1)
+
 	def __eq__(self, other) -> bool:
 		return self.i == other.i and self.j == other.j
 	
