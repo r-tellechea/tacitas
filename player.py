@@ -8,7 +8,7 @@ class Player():
 		return str(self.player_name)
 
 	def __eq__(self, other) -> bool:
-		return self.player_name == self.player_name
+		return self.player_name == other.player_name
 
 	def __invert__(self):
 		return Player(1) if self.player_name == 2 else Player(2)
