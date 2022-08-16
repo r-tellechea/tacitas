@@ -1,6 +1,7 @@
 from piece import Piece
 from player import Player
 from coordinates import Coordinates, Direction
+from start_config import StartConfiguration
 
 class Board ():
 	def __init__(self, limit_i : int = 6, limit_j : int = 6):
@@ -21,7 +22,7 @@ class Board ():
 			for element in line:
 				return_string += '0 ' if element == None else f'{element} '
 			return_string += '\n'
-		return return_string
+		return return_string[:-1]
 
 	def correct_coordinates(self, coordinates : Coordinates) -> bool:
 		return 0 <= coordinates.i < self.limit_i and 0 <= coordinates.j < self.limit_j
@@ -138,6 +139,28 @@ class Board ():
 		self.check_is_piece(coordinates)
 		self.check_correct_movement(coordinates, direction)
 		# TO DO determinar los movimientos disponibles.
+		available_movements = self.available_movements(coordinates)
+		pass
+
+	def get_initial_positions(self, player : Player):
+		if player == self.player_bot:
+			return [
+				Coordinates(i, j)
+					for i in (4, 5)
+						for j in (1,2,3,4)
+			]
+		else:
+			return [
+				Coordinates(i, j)
+					for i in (1, 0)
+						for j in (4,3,2,1)
+			]
+
+	def set_start_configuration(self, player : Player, start_configuration : StartConfiguration) -> None:
+		list_coordinates = self.get_initial_positions(player)
+		list_pieces = start_configuration.line_pieces()
+		for coordinates, piece in zip(list_coordinates, list_pieces):
+			self.set_piece(coordinates, piece)
 
 if __name__ == '__main__':
 	from color import Color
@@ -146,10 +169,10 @@ if __name__ == '__main__':
 	piece_1 = Piece(Color('blue'), Player(2))
 	piece_2 = Piece(Color('blue'), Player(2))
 	board = Board()
-	board.set_piece(Coordinates(0,1), piece_1)
-	board.set_piece(Coordinates(0,2), piece_2)
-	print(board)
-	for dir in board.available_movements(cords):
-		print(dir)
 
+	s_config = StartConfiguration([[Piece(Color('red'), Player(1))] * 4, [Piece(Color('blue'), Player(1))] * 4])
+	print(s_config)
+	board.set_start_configuration(Player(2), s_config)
+	board.set_start_configuration(Player(1), s_config)
+	print(board)
 	

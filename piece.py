@@ -7,4 +7,4 @@ class Piece():
 		self.player = player
 
 	def __str__(self):
-		return str(self.player)
+		return str(self.color + self.player)
