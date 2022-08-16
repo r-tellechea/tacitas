@@ -12,6 +12,12 @@ class Direction():
 		elif self.direction_code == 3:
 			return 'Izquierda'
 	
+	def __eq__(self, other: object) -> bool:
+		return self.direction_code == other.direction_code
+	
+	def __hash__(self) -> int:
+		return hash(self.direction_code)
+	
 	def get_all_directions() -> set:
 		return {Direction(index) for index in range(4)}
 		
