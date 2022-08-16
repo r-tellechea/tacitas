@@ -25,8 +25,6 @@ class Coordinates():
 	def __init__(self, i : int, j : int) -> None:
 		self.i = i
 		self.j = j
-		self.limit_i = limit_i
-		self.limit_j = limit_j
 	
 	def __str__(self) -> str:
 		return f'({self.i}, {self.j})'

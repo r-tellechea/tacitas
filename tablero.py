@@ -35,7 +35,7 @@ class Board ():
 			raise(Exception('No hay una pieza en las coordenadas introducidas.'))	
 	
 	def correct_movement(self, coordinates : Coordinates, direction : Direction) -> bool:
-		return direction in self.movimientos_disponibles(coordinates)
+		return direction in self.available_movements(coordinates)
 
 	def check_correct_movement(self, coordinates : Coordinates, direction : Direction) -> None:
 		if not self.correct_movement(coordinates, direction):
@@ -49,41 +49,21 @@ class Board ():
 		self.check_correct_coordinates(coordinates)
 		return self.cells[coordinates.i][coordinates.j]
 
-	def movimientos_disponibles(self, coordinates : Coordinates):
+	def available_movements(self, coordinates : Coordinates):
 		self.check_is_piece(coordinates)
 		
+		set_directions = Direction.get_all_directions()
 		# Quitamos de todas las posibles direcciones las que no son posibles por:
 		# 1) La dirección choca con una pared.
+		set_directions &= self.movements_wall(coordinates)
 		# 2) La dirección choca con una esquina.
-		# TO DO: Que la esquina dependa del jugador.
-		set_directions = self.movimientos_paredes(coordinates) & self.movements_corner(coordinates)
+		set_directions &= self.movements_corner(coordinates)
+		# 3) La dirección señala una pieza propia.
+		set_directions &= self.movements_self_pieces(coordinates)
 
-		## NOS HEMOS QUEDADO AQUI.
+		return set_directions
 
-		# Quitamos de todas las posibles direcciones las que no son posibles por:
-		# 3) La dirección choca con una pieza del propio jugador.
-		# TO DO: Mirar si la pieza es propia o contraria.
-		set_directions = {
-			direction for direction in set_directions
-				if not self.is_piece(coordinates + direction)
-		}
-
-		direcciones_casilla_ocupada = {
-			direction
-				for direction in set_directions
-					if (
-						self.is_piece(coordinates + direction)
-						and 
-						(
-							self.get_piece(coordinates).jugador != 
-							self.get_piece(coordinates + direction).jugador
-						)
-					)
-		}
-
-		return set_directions | direcciones_casilla_ocupada
-
-	def movimientos_paredes(self, coordinates : Coordinates) -> set[Direction]:
+	def movements_wall(self, coordinates : Coordinates) -> set[Direction]:
 		directions = Direction.get_all_directions()
 		if coordinates.i == 0:
 			directions - {Direction(0)}
@@ -118,25 +98,39 @@ class Board ():
 		if piece.color == self.color_red:
 			return directions - {
 				restricted_corner[coordinates] 
-					if not coordinates in restricted_corner 
-						else None
+					if coordinates in restricted_corner else None
 			}
 		else:
 			if piece.player == self.player_top:
 				return directions - {
 					restricted_corner_top[coordinates] 
-						if not coordinates in restricted_corner_top 
-							else None
+						if coordinates in restricted_corner_top else None
 				}
 			else:
 				return directions - {
 					restricted_corner_bot[coordinates] 
-						if not coordinates in restricted_corner_bot 
-							else None
+						if coordinates in restricted_corner_bot else None
 				}
 
+	def movements_self_pieces(self, coordinates : Coordinates) -> set[Direction]:
+		set_directions = Direction.get_all_directions()
+		set_directions = {
+			direction 
+				for direction in set_directions 
+					if self.correct_coordinates(coordinates + direction)
+		}
+		set_directions = {
+			direction
+				for direction in set_directions
+					if not (
+						self.is_piece(coordinates + direction) and 
+						self.get_piece(coordinates).player == 
+						self.get_piece(coordinates + direction).player
+					)
+		}
+		return set_directions
 	
-	def mover_piece(self, coordinates : Coordinates, direction : Direction) -> None:
+	def move_piece(self, coordinates : Coordinates, direction : Direction) -> None:
 		self.check_is_piece(coordinates)
 		self.check_correct_movement(coordinates, direction)
 		# TO DO determinar los movimientos disponibles.
@@ -144,9 +138,14 @@ class Board ():
 if __name__ == '__main__':
 	from color import Color
 	from player import Player
-	piece_1 = Piece(Color('red'), Player(1))
+	cords = Coordinates(0,1)
+	piece_1 = Piece(Color('blue'), Player(2))
 	piece_2 = Piece(Color('blue'), Player(2))
 	board = Board()
 	board.set_piece(Coordinates(0,1), piece_1)
 	board.set_piece(Coordinates(0,2), piece_2)
 	print(board)
+	for dir in board.available_movements(cords):
+		print(dir)
+
+	
