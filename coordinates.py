@@ -35,6 +35,12 @@ class Coordinates():
 		elif other.direction_code == 3:
 			return (self.i, self.j - 1)
 		
+	def __eq__(self, other) -> bool:
+		return self.i == other.i and self.j == other.j
+	
+	def __hash__(self) -> int:
+		return hash((self.i, self.j))
+	
 	def valid(self) -> bool:
 		return 0 <= self.i < self.limit_i and 0 <= self.j < self.limit_j
 
