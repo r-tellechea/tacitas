@@ -3,8 +3,12 @@ from player import Player
 from coordinates import Coordinates, Direction
 
 class Board ():
-	def __init__(self):
+	def __init__(self, limit_i : int = 6, limit_j : int = 6):
 		self.cells = [[None for _ in range(6)] for _ in range(6)]
+
+		self.limit_i = limit_i
+		self.limit_j = limit_j
+
 		self.player_top = Player()
 		self.player_bot = ~self.player_top
 		# TO DO: Que quede tan chulo como arriba.
@@ -20,7 +24,7 @@ class Board ():
 		return return_string
 
 	def correct_coordinates(self, coordinates : Coordinates) -> bool:
-		return 0 <= coordinates.i < 6 and 0 <= coordinates.j < 6
+		return 0 <= coordinates.i < self.limit_i and 0 <= coordinates.j < self.limit_j
 
 	def check_correct_coordinates(self, coordinates : Coordinates) -> None:
 		if not self.correct_coordinates(coordinates):
